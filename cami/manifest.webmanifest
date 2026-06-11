@@ -1,0 +1,16 @@
+{
+  "name": "El videojuego de Cami",
+  "short_name": "Cami",
+  "lang": "es",
+  "dir": "ltr",
+  "start_url": ".",
+  "scope": ".",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#ff4fa3",
+  "theme_color": "#ff4fa3",
+  "description": "Juegos educativos para niñas de 2 años: colores, formas, animales, números y más.",
+  "icons": [
+    { "src": "icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any maskable" }
+  ]
+}

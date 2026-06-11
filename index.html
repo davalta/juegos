@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#11131a">
+  <title>Juegos · césar de la rosa</title>
+  <meta name="description" content="Pequeña arcade de proyectos: el videojuego de Cami y un tributo jugable a Tibia 7.6.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🕹️%3C/text%3E%3C/svg%3E">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--ink:#e8e6f0;--muted:#9a96b0}
+    html,body{min-height:100%}
+    body{
+      font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(120% 90% at 15% 0%, #20133a 0%, transparent 55%),
+        radial-gradient(120% 90% at 90% 10%, #102a2a 0%, transparent 55%),
+        linear-gradient(160deg,#0d0e15,#0a0b11 60%,#070810);
+      display:flex;flex-direction:column;align-items:center;
+      padding:max(28px,6vh) 20px 40px;
+    }
+    header{text-align:center;margin-bottom:clamp(28px,6vh,56px)}
+    .kicker{letter-spacing:.32em;text-transform:uppercase;font-size:12px;color:var(--muted)}
+    h1{font-size:clamp(34px,7vw,58px);font-weight:800;letter-spacing:-.5px;margin:.18em 0 .12em;
+       background:linear-gradient(90deg,#ff7ac1,#c08bff 45%,#5fd0c8);
+       -webkit-background-clip:text;background-clip:text;color:transparent}
+    header p{color:var(--muted);font-size:clamp(14px,2.5vw,17px)}
+    .grid{display:grid;gap:22px;grid-template-columns:repeat(2,minmax(0,1fr));
+          width:100%;max-width:840px}
+    @media(max-width:680px){.grid{grid-template-columns:1fr}}
+    .card{
+      position:relative;display:flex;flex-direction:column;gap:14px;
+      text-decoration:none;color:inherit;overflow:hidden;
+      border-radius:20px;padding:26px 24px 24px;min-height:260px;
+      border:1px solid rgba(255,255,255,.10);
+      background:var(--bg);
+      box-shadow:0 12px 40px rgba(0,0,0,.45);
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .card:hover{transform:translateY(-6px);box-shadow:0 22px 60px rgba(0,0,0,.55);
+                border-color:rgba(255,255,255,.22)}
+    .card:focus-visible{outline:2px solid #fff;outline-offset:3px}
+    .cami{--bg:radial-gradient(130% 120% at 0% 0%,#ff6db0 0%,#b25cff 55%,#5a2aa6 100%)}
+    .tibia{--bg:radial-gradient(130% 120% at 100% 0%,#7a6a3f 0%,#3b3a36 55%,#1c1b18 100%)}
+    .emoji{font-size:46px;line-height:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,.35))}
+    .card h2{font-size:clamp(22px,3.4vw,27px);font-weight:800;letter-spacing:-.3px}
+    .card p{font-size:14.5px;opacity:.92}
+    .tibia p,.tibia h2{text-shadow:0 1px 2px rgba(0,0,0,.5)}
+    .spacer{flex:1}
+    .play{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;
+          font-weight:700;font-size:14px;padding:9px 16px;border-radius:999px;
+          background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.30);
+          backdrop-filter:blur(4px)}
+    .card:hover .play{background:rgba(0,0,0,.42)}
+    .tag{position:absolute;top:16px;right:16px;font-size:11px;letter-spacing:.08em;
+         text-transform:uppercase;padding:4px 9px;border-radius:999px;
+         background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.22)}
+    .pixel{font-family:"Courier New",monospace;font-weight:700}
+    footer{margin-top:clamp(34px,7vh,64px);color:var(--muted);font-size:12.5px;text-align:center;max-width:540px}
+    footer a{color:#b9a0ff;text-decoration:none}
+    footer a:hover{text-decoration:underline}
+    .disclaimer{margin-top:8px;opacity:.7;font-size:11.5px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="kicker">césar de la rosa</div>
+    <h1>Arcade</h1>
+    <p>Un par de juegos hechos en casa. Elige tu aventura.</p>
+  </header>
+
+  <main class="grid">
+    <a class="card cami" href="cami/">
+      <span class="tag">para peques</span>
+      <span class="emoji">🎀</span>
+      <h2>El videojuego de Cami</h2>
+      <p>Juegos educativos y coloridos para los más pequeños: burbujas, animales, colores, formas y más.</p>
+      <span class="spacer"></span>
+      <span class="play">Jugar ▸</span>
+    </a>
+
+    <a class="card tibia" href="tibia/">
+      <span class="tag pixel">7.6</span>
+      <span class="emoji">🐉</span>
+      <h2>Tibia <span class="pixel">7.6</span> — Tributo</h2>
+      <p>Explora una isla, caza criaturas, saquea cadáveres y lanza las runas clásicas. Un homenaje jugable al cliente de 2005.</p>
+      <span class="spacer"></span>
+      <span class="play">Entrar ▸</span>
+    </a>
+  </main>
+
+  <footer>
+    Hecho con cariño. ·
+    <a href="https://cesardelarosa.org">cesardelarosa.org</a>
+    <div class="disclaimer">El tributo a Tibia es un proyecto de fans sin fines de lucro, no afiliado a CipSoft. Arte original.</div>
+  </footer>
+</body>
+</html>

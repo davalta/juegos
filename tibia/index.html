@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tibia 7.6 — A Tribute</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="client">
+    <!-- title bar -->
+    <header id="titlebar">
+      <span class="title-logo">Tibia</span>
+      <span class="title-sub">7.6 &mdash; a fan tribute</span>
+      <div class="title-spacer"></div>
+      <button id="reset-btn" class="tb-btn" title="Start a new character">Reset Character</button>
+    </header>
+
+    <div id="main">
+      <!-- game world -->
+      <section id="viewport-wrap">
+        <canvas id="game" width="480" height="352"></canvas>
+        <div id="viewport-frame"></div>
+      </section>
+
+      <!-- right side panels -->
+      <aside id="sidebar">
+        <div class="panel">
+          <div class="panel-title">Minimap</div>
+          <div class="panel-body minimap-body">
+            <canvas id="minimap" width="128" height="128"></canvas>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-body status-body">
+            <div class="bar-row">
+              <span class="bar-label hp">HP</span>
+              <div class="bar"><div id="hp-fill" class="bar-fill hp"></div><span id="hp-text" class="bar-text"></span></div>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label mana">MP</span>
+              <div class="bar"><div id="mana-fill" class="bar-fill mana"></div><span id="mana-text" class="bar-text"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Spells</div>
+          <div class="panel-body spell-body">
+            <button class="spell-btn" data-spell="exura" title="Light Healing (20 mana)">exura</button>
+            <button class="spell-btn" data-spell="exura vita" title="Ultimate Healing (80 mana)">exura vita</button>
+            <button class="spell-btn" data-spell="exori" title="Berserk (25 mana)">exori</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Inventory</div>
+          <div class="panel-body">
+            <div id="equipment" class="paper-doll">
+              <div class="doll-cell spacer"></div>
+              <div class="doll-cell" data-slot="helmet"   data-label="head"></div>
+              <div class="doll-cell spacer"></div>
+              <div class="doll-cell" data-slot="amulet"   data-label="neck"></div>
+              <div class="doll-cell" data-slot="armor"    data-label="body"></div>
+              <div class="doll-cell" data-slot="backpack" data-label="bp"></div>
+              <div class="doll-cell" data-slot="weapon"   data-label="hand"></div>
+              <div class="doll-cell" data-slot="legs"     data-label="legs"></div>
+              <div class="doll-cell" data-slot="shield"   data-label="hand"></div>
+              <div class="doll-cell" data-slot="ring"     data-label="ring"></div>
+              <div class="doll-cell" data-slot="boots"    data-label="feet"></div>
+              <div class="doll-cell spacer"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Backpack</div>
+          <div class="panel-body">
+            <div id="backpack" class="bp-grid"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Skills</div>
+          <div class="panel-body" id="skills"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Battle</div>
+          <div class="panel-body" id="battle-list"></div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- console -->
+    <footer id="console">
+      <div class="console-tabs">
+        <button class="console-tab active" data-tab="default">Default</button>
+        <button class="console-tab" data-tab="server">Server Log</button>
+      </div>
+      <div id="console-log"></div>
+      <div class="console-input-row">
+        <span class="say-label">Say:</span>
+        <input id="chat-input" type="text" autocomplete="off" spellcheck="false"
+               placeholder="type a spell, e.g. exura, then press Enter">
+      </div>
+    </footer>
+  </div>
+
+  <!-- loot window -->
+  <div id="loot-window" class="floating-window hidden">
+    <div class="window-title">
+      <span>Loot</span>
+      <button id="loot-close" class="window-close">×</button>
+    </div>
+    <div id="loot-items" class="bp-grid"></div>
+  </div>
+
+  <!-- death screen -->
+  <div id="death-screen" class="hidden">
+    <div class="death-card">
+      <div class="death-title">You are dead.</div>
+      <p>Your soul drifts back to the temple. You have lost some experience.</p>
+      <button id="respawn-btn" class="tb-btn big">Enter Game</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

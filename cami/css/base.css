@@ -1,0 +1,197 @@
+/* ===== Reset y base ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: #2a0f2e;
+  font-family: "Baloo 2", "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
+  overscroll-behavior: none;
+  -webkit-user-select: none; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+/* ===== Viewport + escenario escalado ===== */
+#viewport { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,120,200,.25), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(120,180,255,.22), transparent 42%),
+    #2a0f2e;
+}
+#stage {
+  position: absolute; left: 50%; top: 50%;
+  width: 1600px; height: 900px;
+  margin-left: -800px; margin-top: -450px;
+  transform-origin: center center;
+  overflow: hidden;
+  border-radius: 28px;
+  background: linear-gradient(180deg, #aee9ff 0%, #d8f5ff 60%, #c6f0c0 100%);
+  box-shadow: 0 30px 80px rgba(0,0,0,.45);
+  touch-action: none;
+}
+#scene { position: absolute; inset: 0; }
+#fx { position: absolute; inset: 0; pointer-events: none; z-index: 50; }
+#hud { position: absolute; inset: 0; pointer-events: none; z-index: 40; }
+#hud button { pointer-events: auto; }
+#overlay { position: absolute; inset: 0; z-index: 60; pointer-events: none; }
+#overlay.show { pointer-events: auto; }
+
+/* ===== Overlay "gira el teléfono" ===== */
+#rotate-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  display: none; align-items: center; justify-content: center;
+  background: linear-gradient(160deg, #ff7ec0, #ff4fa3 60%, #c43a8e);
+}
+.rotate-card { text-align: center; color: #fff; }
+.rotate-phone { font-size: 110px; animation: rotatePhone 2s ease-in-out infinite; }
+.rotate-text { font-size: 44px; font-weight: 800; margin-top: 10px; text-shadow: 0 3px 0 rgba(0,0,0,.15); }
+.rotate-sub { font-size: 26px; margin-top: 6px; opacity: .95; }
+@keyframes rotatePhone {
+  0%, 40% { transform: rotate(0deg); }
+  60%, 100% { transform: rotate(90deg); }
+}
+@media (orientation: portrait) and (pointer: coarse) {
+  #rotate-overlay:not([hidden]) { display: flex; }
+}
+
+/* ===== HUD (botón casa + estrellas de progreso) ===== */
+.hud-home {
+  position: absolute; left: 26px; top: 24px;
+  width: 110px; height: 110px; border-radius: 28px;
+  background: #fff; box-shadow: 0 8px 0 #d23b86, 0 14px 24px rgba(0,0,0,.25);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .12s;
+}
+.hud-home:active { transform: translateY(5px) scale(.96); box-shadow: 0 3px 0 #d23b86; }
+.hud-home svg { width: 64px; height: 64px; }
+.hud-stars {
+  position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 16px; background: rgba(255,255,255,.55);
+  padding: 12px 22px; border-radius: 40px; backdrop-filter: blur(4px);
+}
+.hud-star {
+  width: 56px; height: 56px; color: #ffffff;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,.2));
+  transition: transform .3s cubic-bezier(.2,1.6,.4,1);
+}
+.hud-star.on { color: #ffd23f; transform: scale(1.15); }
+.hud-star svg { width: 100%; height: 100%; }
+
+/* ===== Botones de esquina (mute / fullscreen) ===== */
+.corner-btns { position: absolute; right: 26px; top: 24px; display: flex; gap: 14px; z-index: 5; }
+.corner-btn {
+  width: 84px; height: 84px; border-radius: 24px;
+  background: rgba(255,255,255,.85); box-shadow: 0 6px 0 rgba(0,0,0,.15);
+  display: flex; align-items: center; justify-content: center; font-size: 40px;
+  transition: transform .12s;
+}
+.corner-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,.15); }
+
+/* ===== HOME ===== */
+.home-sky { position: absolute; inset: 0; overflow: hidden;
+  background: linear-gradient(180deg, #ffd9f0 0%, #ffc2e6 40%, #ffe7b8 100%); }
+.home-sun { position: absolute; left: 70px; top: 60px; width: 180px; height: 180px; }
+.home-sun .rays { animation: spin 26s linear infinite; transform-origin: 90px 90px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.home-cloud { position: absolute; font-size: 90px; opacity: .9; animation: drift 30s linear infinite; }
+@keyframes drift { from { transform: translateX(-220px); } to { transform: translateX(1820px); } }
+.home-house { position: absolute; right: 60px; bottom: 0; width: 520px; height: 520px; opacity: .95; }
+.home-title {
+  position: absolute; top: 26px; left: 50%; transform: translateX(-50%);
+  font-size: 88px; font-weight: 900; color: #fff;
+  text-shadow: 0 4px 0 #ff4fa3, 0 8px 0 #d23b86, 0 12px 18px rgba(0,0,0,.25);
+  letter-spacing: 2px;
+}
+.home-title .spark { color: #ffd23f; }
+
+.home-grid {
+  position: absolute; left: 340px; top: 290px;
+  display: grid; grid-template-columns: repeat(4, 290px); grid-auto-rows: 250px;
+  gap: 24px;
+}
+.tile {
+  border-radius: 36px; position: relative; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  box-shadow: 0 12px 0 rgba(0,0,0,.18), 0 18px 30px rgba(0,0,0,.22);
+  border: 6px solid rgba(255,255,255,.85);
+  transition: transform .14s cubic-bezier(.2,1.4,.4,1);
+}
+.tile:active { transform: scale(.93); }
+.tile .tile-icon { font-size: 110px; line-height: 1; filter: drop-shadow(0 4px 4px rgba(0,0,0,.18)); }
+.tile .tile-name { margin-top: 6px; font-size: 30px; font-weight: 800; color: #fff;
+  text-shadow: 0 2px 0 rgba(0,0,0,.18); }
+.tile .tile-stars { display: flex; gap: 4px; margin-top: 6px; }
+.tile .tile-stars .s { width: 26px; height: 26px; color: rgba(255,255,255,.5); }
+.tile .tile-stars .s.on { color: #ffd23f; }
+.tile .tile-stars svg { width: 100%; height: 100%; }
+.tile .shine { position: absolute; top: -40%; left: -30%; width: 60%; height: 180%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent);
+  transform: rotate(18deg); animation: shine 5s ease-in-out infinite; }
+@keyframes shine { 0%,70% { left: -40%; } 85%,100% { left: 130%; } }
+
+/* Cami + Lola en el home (columna izquierda, sin tapar los tiles) */
+.home-cami { position: absolute; left: 16px; bottom: 0; width: 250px; height: 360px;
+  animation: bob 3s ease-in-out infinite; }
+.home-lola { position: absolute; left: 180px; bottom: 0; width: 140px; height: 175px;
+  animation: bob 3s ease-in-out infinite .4s; }
+.home-cami:active, .home-lola:active { animation: jump .6s ease; }
+@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+@keyframes jump { 0%{transform:translateY(0)} 30%{transform:translateY(-50px) scale(1.05)} 60%{transform:translateY(0)} 80%{transform:translateY(-16px)} 100%{transform:translateY(0)} }
+
+/* ===== Celebración ===== */
+.celebrate {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 20px;
+  background: radial-gradient(circle at 50% 40%, rgba(255,140,210,.55), rgba(120,40,120,.75));
+  opacity: 0; transition: opacity .35s;
+}
+.celebrate.in { opacity: 1; }
+.celebrate .cel-cami { width: 280px; height: 360px; animation: jump 1s ease infinite; }
+.celebrate .cel-text { font-size: 70px; font-weight: 900; color: #fff;
+  text-shadow: 0 4px 0 #ff4fa3, 0 8px 16px rgba(0,0,0,.3); }
+.celebrate .cel-stars { display: flex; gap: 24px; }
+.celebrate .cel-stars .big { width: 110px; height: 110px; color: #ffd23f;
+  filter: drop-shadow(0 6px 6px rgba(0,0,0,.3)); transform: scale(0); }
+.celebrate .cel-stars .big.pop { animation: starIn .5s cubic-bezier(.2,1.8,.4,1) forwards; }
+@keyframes starIn { to { transform: scale(1) rotate(0); } from { transform: scale(0) rotate(-40deg); } }
+.celebrate .cel-btns { display: flex; gap: 40px; margin-top: 10px; }
+.cel-btn { width: 140px; height: 140px; border-radius: 40px; background: #fff;
+  box-shadow: 0 10px 0 #d23b86, 0 16px 26px rgba(0,0,0,.3);
+  display: flex; align-items: center; justify-content: center; transition: transform .12s; }
+.cel-btn:active { transform: translateY(6px); box-shadow: 0 4px 0 #d23b86; }
+.cel-btn svg { width: 80px; height: 80px; }
+
+/* ===== Animaciones compartidas para juegos ===== */
+.wiggle { animation: wiggle .5s ease; }
+@keyframes wiggle {
+  0%,100% { transform: translateX(0) rotate(0); }
+  20% { transform: translateX(-12px) rotate(-5deg); }
+  40% { transform: translateX(12px) rotate(5deg); }
+  60% { transform: translateX(-9px) rotate(-3deg); }
+  80% { transform: translateX(9px) rotate(3deg); }
+}
+.pulse { animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+.blink { animation: blink 4s infinite; }
+@keyframes blink { 0%,94%,100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
+.dragging { z-index: 30 !important; filter: drop-shadow(0 12px 14px rgba(0,0,0,.35)); }
+
+/* ===== Manita de pista (estilo Bimi Boo) ===== */
+.hint-hand {
+  position: absolute; z-index: 45; pointer-events: none;
+  font-size: 96px; line-height: 1;
+  transform: translate(-26%, -12%);
+  filter: drop-shadow(0 6px 8px rgba(0,0,0,.35));
+}
+.hint-hand .hh-inner { display: inline-block; animation: handTap .8s ease-in-out infinite; }
+@keyframes handTap { 0%,100% { transform: scale(1) rotate(-8deg); } 50% { transform: scale(.85) rotate(-2deg); } }
+
+/* Botón grande genérico de juego */
+.game-prompt {
+  position: absolute; left: 50%; top: 150px; transform: translateX(-50%);
+  background: rgba(255,255,255,.9); padding: 14px 36px; border-radius: 50px;
+  font-size: 40px; font-weight: 800; color: #c43a6e; box-shadow: 0 6px 0 rgba(0,0,0,.12);
+  max-width: 1000px; text-align: center;
+}
+.replay-prompt { display:flex; align-items:center; gap:10px; }

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#ffd1ec"/>
+      <stop offset="100%" stop-color="#ff4fa3"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <!-- coletas -->
+  <ellipse cx="150" cy="300" rx="55" ry="80" fill="#7a4a25"/>
+  <ellipse cx="362" cy="300" rx="55" ry="80" fill="#7a4a25"/>
+  <!-- cara -->
+  <circle cx="256" cy="268" r="120" fill="#ffe0c2"/>
+  <!-- cabello -->
+  <path d="M140 250 q116 -150 232 0 q-30 -55 -116 -55 q-86 0 -116 55z" fill="#7a4a25"/>
+  <!-- ojos -->
+  <circle cx="214" cy="268" r="20" fill="#3a2417"/>
+  <circle cx="298" cy="268" r="20" fill="#3a2417"/>
+  <circle cx="221" cy="261" r="7" fill="#fff"/>
+  <circle cx="305" cy="261" r="7" fill="#fff"/>
+  <!-- cachetes -->
+  <circle cx="186" cy="306" r="18" fill="#ff9ec4" opacity="0.7"/>
+  <circle cx="326" cy="306" r="18" fill="#ff9ec4" opacity="0.7"/>
+  <!-- sonrisa -->
+  <path d="M214 318 q42 38 84 0" fill="none" stroke="#c43a6e" stroke-width="9" stroke-linecap="round"/>
+  <!-- moño de lunares -->
+  <g transform="translate(256 150)">
+    <path d="M0 0 L-60 -34 Q-78 -2 -60 30 Z" fill="#ff3d8b"/>
+    <path d="M0 0 L60 -34 Q78 -2 60 30 Z" fill="#ff3d8b"/>
+    <circle cx="0" cy="-2" r="18" fill="#e62e78"/>
+    <circle cx="-44" cy="-16" r="6" fill="#fff"/>
+    <circle cx="-38" cy="10" r="6" fill="#fff"/>
+    <circle cx="44" cy="-16" r="6" fill="#fff"/>
+    <circle cx="38" cy="10" r="6" fill="#fff"/>
+  </g>
+</svg>
