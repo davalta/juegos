@@ -108,5 +108,16 @@ var Art = {
   heartIcon: function (color) {
     color = color || '#ff4fa3';
     return '<svg viewBox="0 0 24 24"><path fill="' + color + '" d="M12 21s-7-4.6-9.5-8.2C.9 10.2 1.6 6.8 4.6 5.6c2-.8 3.9.1 4.9 1.6 1-1.5 2.9-2.4 4.9-1.6 3 1.2 3.7 4.6 2.1 7.2C19 16.4 12 21 12 21z"/></svg>';
+  },
+
+  // Cami "porrista": aparece en una esquina del juego, hace una animación cada
+  // cierto tiempo y brinca con cada acierto (shell le pone .cheer).
+  addCheer: function (parent, css) {
+    var c = document.createElement('div');
+    c.className = 'game-cami';
+    if (css) c.style.cssText = css;
+    c.innerHTML = this.cami({ blink: true });
+    parent.appendChild(c);
+    return c;
   }
 };

@@ -44,5 +44,8 @@
   stage.addEventListener('dblclick', function (e) { e.preventDefault(); });
   document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
 
-  Shell.showHome();
+  // enlace directo a un juego: /cami/?juego=caminito (lo usa el portal)
+  var deep = /[?&]juego=([\w-]+)/.exec(location.search);
+  if (deep && window.GAMES[deep[1]]) Shell.startGame(deep[1]);
+  else Shell.showHome();
 })();

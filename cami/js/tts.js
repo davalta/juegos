@@ -20,30 +20,53 @@ var Voz = {
     try {
       var voices = window.speechSynthesis.getVoices();
       if (voices && voices.length) {
+        var prev = this.voice && this.voice.name;
         this.voice = this._pick(voices);
         this.ready = true;
+        if (this.voice && this.voice.name !== prev) {
+          try { console.log('[Voz] usando: ' + this.voice.name + ' (' + this.voice.lang + ')'); } catch (e) {}
+        }
       }
     } catch (e) { /* nada */ }
   },
 
   _pick: function (voices) {
-    var prefs = ['es-mx', 'es-us', 'es-419', 'es-co', 'es-ar', 'es-es', 'es'];
-    var names = ['sabina', 'paulina', 'dalia', 'mónica', 'monica', 'jorge', 'google español'];
-    // primero por nombre conocido + idioma español
-    for (var n = 0; n < names.length; n++) {
+    // Las voces "Google" (online de Chrome) y las "Natural/Online" suenan MUCHO
+    // más humanas que las Microsoft locales (Sabina/Raul = robóticas tipo Loquendo).
+    function esVoices(filter) {
+      var out = [];
       for (var i = 0; i < voices.length; i++) {
         var v = voices[i];
-        if ((v.lang || '').toLowerCase().indexOf('es') === 0 &&
-            (v.name || '').toLowerCase().indexOf(names[n]) !== -1) return v;
+        var lang = (v.lang || '').toLowerCase().replace('_', '-');
+        var name = (v.name || '').toLowerCase();
+        if (lang.indexOf('es') === 0 && filter(name, lang)) out.push(v);
       }
+      return out;
     }
-    // luego por prioridad de locale
-    for (var p = 0; p < prefs.length; p++) {
-      for (var j = 0; j < voices.length; j++) {
-        if ((voices[j].lang || '').toLowerCase().indexOf(prefs[p]) === 0) return voices[j];
+    function byLocale(list) {
+      var prefs = ['es-us', 'es-419', 'es-mx', 'es-co', 'es-ar', 'es-es', 'es'];
+      for (var p = 0; p < prefs.length; p++) {
+        for (var i = 0; i < list.length; i++) {
+          if ((list[i].lang || '').toLowerCase().replace('_', '-').indexOf(prefs[p]) === 0) return list[i];
+        }
       }
+      return list[0] || null;
     }
-    return null;
+    // 1) Google español (Chrome online, calidad alta)
+    var g = esVoices(function (n) { return n.indexOf('google') !== -1; });
+    if (g.length) return byLocale(g);
+    // 2) Voces "Natural"/"Online" (Edge neural)
+    var nat = esVoices(function (n) { return n.indexOf('natural') !== -1 || n.indexOf('online') !== -1; });
+    if (nat.length) return byLocale(nat);
+    // 3) Mejores voces locales conocidas (iOS/macOS/Android)
+    var names = ['paulina', 'mónica', 'monica', 'luciana', 'angélica', 'angelica', 'juan', 'dalia'];
+    for (var n = 0; n < names.length; n++) {
+      var hit = esVoices(function (nm) { return nm.indexOf(names[n]) !== -1; });
+      if (hit.length) return byLocale(hit);
+    }
+    // 4) lo que haya en español
+    var any = esVoices(function () { return true; });
+    return byLocale(any);
   },
 
   setMuted: function (m) {
@@ -60,8 +83,9 @@ var Voz = {
       var u = new SpeechSynthesisUtterance(text);
       if (this.voice) { u.voice = this.voice; u.lang = this.voice.lang; }
       else { u.lang = 'es-MX'; }
-      u.rate = opts.rate != null ? opts.rate : 0.92;
-      u.pitch = opts.pitch != null ? opts.pitch : 1.15;
+      // entonación alegre: más aguda y ágil, con variación leve para no sonar plana
+      u.rate = opts.rate != null ? opts.rate : (1.0 + Math.random() * 0.06);
+      u.pitch = opts.pitch != null ? opts.pitch : (1.3 + Math.random() * 0.1);
       u.volume = 1;
       window.speechSynthesis.speak(u);
     } catch (e) { /* nada */ }

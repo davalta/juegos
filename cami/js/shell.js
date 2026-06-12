@@ -26,6 +26,7 @@ var Shell = {
   _idleLast: 0,
   _idleCfg: null,
   _idleTimer: null,
+  _hintSpoken: false,   // la voz de la pista solo se dice UNA vez por ronda
 
   _startIdle: function () {
     var self = this;
@@ -116,6 +117,7 @@ var Shell = {
     Sound.play('whoosh');
     api.round = 0; api.totalRounds = game.rounds;
     this._startIdle();
+    this._hintSpoken = false;
     // deja que el intro hablado se escuche antes de arrancar la ronda
     this.after(1100, function () { if (game.nextRound) game.nextRound(0); });
   },
@@ -189,6 +191,12 @@ var Shell = {
           Confetti.hearts(x, y, 6);
         }
         Voz.speak(opts.say || Voz.pick(Voz.PRAISE));
+        // Cami porrista (si el juego la tiene) festeja cada acierto
+        var gc = document.querySelector('.game-cami');
+        if (gc) {
+          gc.classList.remove('cheer'); void gc.offsetWidth; gc.classList.add('cheer');
+          setTimeout(function () { gc.classList.remove('cheer'); }, 800);
+        }
       },
 
       wrong: function (el, opts) {
@@ -209,6 +217,7 @@ var Shell = {
         if (self.round < game.rounds) {
           self.after(1300, function () {
             api.round = self.round;
+            self._hintSpoken = false; // nueva ronda: la pista puede hablar una vez más
             if (game.nextRound) game.nextRound(self.round);
           });
         } else {
@@ -228,6 +237,12 @@ var Shell = {
       // pista por inactividad: tras ms sin tocar, ejecuta fn (manita + voz)
       idleHint: function (ms, fn) { self._idleCfg = { ms: ms, fn: fn }; },
       hand: function (fromEl, toEl) { Shell.hand(fromEl, toEl); },
+      // voz de pista: suena solo la PRIMERA vez por ronda (la manita sí se repite)
+      hintSpeak: function (t, o) {
+        if (self._hintSpoken) return;
+        self._hintSpoken = true;
+        Voz.speak(t, o);
+      },
 
       after: function (ms, fn) { return self.after(ms, fn); }
     };

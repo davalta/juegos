@@ -1,8 +1,9 @@
-/* Burbujas — tocar burbujas flotantes para reventarlas (causa-efecto + vocabulario). */
+/* Burbujas — ¡atrapa 3 del objetivo! Atención selectiva + vocabulario + conteo 1-3.
+   Un panel muestra qué hay que atrapar; las demás burbujas son distractores. */
 GAMES['burbujas'] = {
   id: 'burbujas',
   title: 'Burbujas',
-  intro: '¡Toca las burbujas, Cami!',
+  intro: '¡Atrapa las burbujas, Cami!',
   color: '#5ec8ff',
   icon: '🫧',
   rounds: 5,
@@ -14,30 +15,52 @@ GAMES['burbujas'] = {
     [['⚽', 'la pelota'], ['🧸', 'el osito'], ['🎈', 'el globo'], ['🚗', 'el carro'], ['🥁', 'el tambor']],
     [['🦋', 'la mariposa'], ['🐞', 'la catarina'], ['🐝', 'la abeja'], ['🐢', 'la tortuga'], ['🐠', 'el pececito']]
   ],
+  COUNT_WORDS: ['', '¡Una!', '¡Dos!', '¡Tres!'],
+  GOAL: 3,
 
   init: function (scene, api) {
     this.api = api;
-    this.scene = scene;
+    this.root = scene;
     this.bubbles = [];
     this.raf = null;
-    this.popped = 0;
+    this.caught = 0;
     this.roundDone = false;
 
     var wrap = document.createElement('div');
     wrap.className = 'g-burbujas';
-    wrap.innerHTML = '<div class="bubbles-bg"></div>';
+    wrap.innerHTML = '<div class="bubbles-bg"></div><div class="bub-goal" id="bub-goal"></div>';
     scene.appendChild(wrap);
     this.wrap = wrap;
+    this.goalEl = wrap.querySelector('#bub-goal');
 
     var self = this;
     this.tick = function () { self._update(); self.raf = requestAnimationFrame(self.tick); };
+
+    // pista: la manita toca una burbuja objetivo + recuerda la misión (voz solo 1 vez)
+    api.idleHint(8000, function () {
+      for (var i = 0; i < self.bubbles.length; i++) {
+        if (!self.bubbles[i].dead && self.bubbles[i].isTarget) {
+          self.api.hand(self.bubbles[i].el, null);
+          self.api.hintSpeak('¡Atrapa ' + self.target[1] + '!');
+          return;
+        }
+      }
+    });
   },
 
   nextRound: function (i) {
-    this.popped = 0;
+    this.caught = 0;
     this.roundDone = false;
     this.theme = this.THEMES[i % this.THEMES.length];
-    // limpia y recrea burbujas
+    this.target = this.theme[Math.floor(Math.random() * this.theme.length)];
+
+    // panel de meta: 3 siluetas del objetivo que se van iluminando
+    var html = '';
+    for (var g = 0; g < this.GOAL; g++) html += '<span class="bg-slot">' + this.target[0] + '</span>';
+    this.goalEl.innerHTML = html;
+
+    Voz.speak('¡Atrapa ' + this.target[1] + '! ¡Tres veces!');
+
     this._clearBubbles();
     for (var k = 0; k < 7; k++) this._spawn(true);
     if (!this.raf) this.tick();
@@ -50,12 +73,27 @@ GAMES['burbujas'] = {
     this.bubbles = [];
   },
 
+  _aliveTargets: function () {
+    var n = 0;
+    for (var i = 0; i < this.bubbles.length; i++) if (!this.bubbles[i].dead && this.bubbles[i].isTarget) n++;
+    return n;
+  },
+
   _spawn: function (spread) {
-    var item = this.theme[Math.floor(Math.random() * this.theme.length)];
+    // garantiza que siempre haya al menos 2 burbujas objetivo a la vista
+    var forceTarget = this._aliveTargets() < 2;
+    var item;
+    if (forceTarget || Math.random() < 0.35) {
+      item = this.target;
+    } else {
+      do { item = this.theme[Math.floor(Math.random() * this.theme.length)]; }
+      while (item === this.target);
+    }
+    var isTarget = item === this.target;
     var size = 200 + Math.random() * 60;
-    var x = 120 + Math.random() * (1360);
-    var y = spread ? (200 + Math.random() * 800) : (940 + Math.random() * 90);
-    var golden = Math.random() < 0.13;
+    var x = 120 + Math.random() * 1360;
+    var y = spread ? (260 + Math.random() * 740) : (940 + Math.random() * 90);
+    var golden = isTarget && Math.random() < 0.15; // dorada = objetivo brillante
     var el = document.createElement('button');
     el.className = 'bubble' + (golden ? ' golden' : '');
     el.style.width = el.style.height = size + 'px';
@@ -63,7 +101,7 @@ GAMES['burbujas'] = {
     var b = { el: el, x: x, y: y, size: size,
               vy: 1.0 + Math.random() * 1.0, phase: Math.random() * 6.28,
               amp: 20 + Math.random() * 30, baseX: x, name: item[1], emoji: item[0],
-              golden: golden, dead: false };
+              isTarget: isTarget, golden: golden, dead: false };
     var self = this;
     el.addEventListener('pointerdown', function (e) { e.preventDefault(); self._pop(b); });
     this.wrap.appendChild(el);
@@ -90,32 +128,36 @@ GAMES['burbujas'] = {
     b.dead = true;
     Sound.play('pop');
     var c = Stage.centerOf(b.el);
-    if (b.golden) {
-      // burbuja dorada: fiesta extra
-      Sound.play('sparkle');
-      Confetti.starPop(c.x, c.y);
-      Confetti.hearts(c.x, c.y, 8);
-      Confetti.burst(c.x, c.y, { count: 18, colors: ['#ffd23f', '#ffe98a', '#fff'] });
-    } else {
-      Confetti.burst(c.x, c.y, { count: 12, shapes: ['rect'], colors: ['#aef0ff', '#fff', '#5ec8ff'] });
-    }
+
     // animación de reventar
     b.el.classList.add('burst');
     var el = b.el;
     setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 260);
-    // zoom del objeto al centro + voz
-    this._zoom(b.emoji);
-    Voz.speak(b.golden ? '¡' + this._cap(b.name) + '! ¡Qué brillante!' : '¡' + this._cap(b.name) + '!');
-
-    // quita de la lista y repón una nueva
     var idx = this.bubbles.indexOf(b);
     if (idx >= 0) this.bubbles.splice(idx, 1);
 
-    this.popped++;
-    if (this.popped >= 6) {
-      this.roundDone = true;
-      this._cascade();
+    if (b.isTarget) {
+      // ¡atrapada! cuenta en voz alta y llena el panel
+      this.caught++;
+      Sound.play(b.golden ? 'sparkle' : 'tada');
+      Confetti.burst(c.x, c.y, { count: b.golden ? 22 : 14 });
+      if (b.golden) Confetti.starPop(c.x, c.y);
+      this._zoom(b.emoji);
+      var slot = this.goalEl.querySelectorAll('.bg-slot')[this.caught - 1];
+      if (slot) slot.classList.add('on');
+
+      if (this.caught >= this.GOAL) {
+        this.roundDone = true;
+        Voz.speak('¡Tres! ¡Lo lograste, Cami!');
+        this._cascade();
+      } else {
+        Voz.speak(this.COUNT_WORDS[this.caught]);
+        this._spawn(false);
+      }
     } else {
+      // distractor: pop suave, a veces dice su nombre (vocabulario sin regaño)
+      Confetti.burst(c.x, c.y, { count: 8, shapes: ['rect'], colors: ['#aef0ff', '#fff', '#5ec8ff'] });
+      if (Math.random() < 0.35) Voz.speak(this._cap(b.name));
       this._spawn(false);
     }
   },

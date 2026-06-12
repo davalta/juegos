@@ -1,6 +1,6 @@
 /* home.js — pantalla de inicio: casa de ensueño, Cami + Lola, y la cuadrícula de juegos. */
 var Home = {
-  ORDER: ['burbujas', 'animales', 'cucu', 'figuras', 'colores', 'tamanos', 'numeros', 'rompecabezas'],
+  ORDER: ['burbujas', 'animales', 'cucu', 'figuras', 'colores', 'tamanos', 'numeros', 'rompecabezas', 'caminito'],
 
   build: function (scene) {
     var self = this;

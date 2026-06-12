@@ -106,9 +106,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .home-title .spark { color: #ffd23f; }
 
 .home-grid {
-  position: absolute; left: 340px; top: 290px;
-  display: grid; grid-template-columns: repeat(4, 290px); grid-auto-rows: 250px;
-  gap: 24px;
+  position: absolute; left: 320px; top: 300px;
+  display: grid; grid-template-columns: repeat(5, 234px); grid-auto-rows: 238px;
+  gap: 20px;
 }
 .tile {
   border-radius: 36px; position: relative; overflow: hidden;
@@ -118,8 +118,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   transition: transform .14s cubic-bezier(.2,1.4,.4,1);
 }
 .tile:active { transform: scale(.93); }
-.tile .tile-icon { font-size: 110px; line-height: 1; filter: drop-shadow(0 4px 4px rgba(0,0,0,.18)); }
-.tile .tile-name { margin-top: 6px; font-size: 30px; font-weight: 800; color: #fff;
+.tile .tile-icon { font-size: 96px; line-height: 1; filter: drop-shadow(0 4px 4px rgba(0,0,0,.18)); }
+.tile .tile-name { margin-top: 6px; font-size: 26px; font-weight: 800; color: #fff;
   text-shadow: 0 2px 0 rgba(0,0,0,.18); }
 .tile .tile-stars { display: flex; gap: 4px; margin-top: 6px; }
 .tile .tile-stars .s { width: 26px; height: 26px; color: rgba(255,255,255,.5); }
@@ -186,6 +186,21 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 .hint-hand .hh-inner { display: inline-block; animation: handTap .8s ease-in-out infinite; }
 @keyframes handTap { 0%,100% { transform: scale(1) rotate(-8deg); } 50% { transform: scale(.85) rotate(-2deg); } }
+
+/* ===== Cami porrista dentro de los juegos ===== */
+.game-cami {
+  position: absolute; left: 16px; bottom: 0; width: 190px; height: 266px;
+  pointer-events: none; z-index: 4;
+  animation: camiIdle 7s ease-in-out infinite;
+}
+@keyframes camiIdle {
+  0%, 68%, 100% { transform: translateY(0); }
+  72% { transform: translateY(-22px) rotate(-3deg); }
+  76% { transform: translateY(0); }
+  80% { transform: translateY(-12px) rotate(3deg); }
+  84% { transform: translateY(0); }
+}
+.game-cami.cheer { animation: jump .7s ease; }
 
 /* Botón grande genérico de juego */
 .game-prompt {
