@@ -53,6 +53,7 @@ var Voz = {
 
   speak: function (text, opts) {
     if (!('speechSynthesis' in window) || this.muted || !text) return;
+    if (document.hidden) return; // no hablar si la pestaña no está visible
     opts = opts || {};
     try {
       if (opts.interrupt !== false) window.speechSynthesis.cancel();

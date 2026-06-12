@@ -32,6 +32,7 @@ var Shell = {
     this._idleLast = Date.now();
     this._idleTimer = setInterval(function () {
       if (!self._idleCfg || !self.current) return;
+      if (document.hidden) return; // no dar pistas habladas si la pestaña no está visible
       if (self.overlay.classList.contains('show')) return;
       if (Date.now() - self._idleLast > self._idleCfg.ms) {
         self._idleLast = Date.now();
