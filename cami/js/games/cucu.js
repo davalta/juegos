@@ -1,5 +1,7 @@
 /* Cucú — los personajes se esconden tras los arbustos; Cami encuentra al nombrado.
-   Trabaja la permanencia del objeto y la memoria. */
+   Permanencia del objeto + memoria. Reto: desde la ronda 3 los arbustos se
+   MUEVEN de lugar después de esconderse (juego de trilero suave).
+   Incentivo: cada amigo encontrado se colecciona en una fila al pie. */
 GAMES['cucu'] = {
   id: 'cucu',
   title: 'Cucú',
@@ -19,17 +21,21 @@ GAMES['cucu'] = {
   SLOTS: [300, 660, 1000, 1340],
 
   init: function (scene, api) {
-    this.api = api; this.scene = scene; this._timers = [];
+    this.api = api; this.root = scene; this._timers = [];
+    this.friends = [];
     var wrap = document.createElement('div');
     wrap.className = 'g-cucu';
     wrap.innerHTML =
       '<div class="cucu-sky"></div>' +
       '<div class="cucu-ground"></div>' +
       '<div class="bush-layer"></div>' +
+      '<div class="cucu-friends" id="cucu-friends"></div>' +
       '<div class="cucu-cloud" id="cucu-cloud"></div>';
     scene.appendChild(wrap);
     this.layer = wrap.querySelector('.bush-layer');
+    this.friendsEl = wrap.querySelector('#cucu-friends');
     this.cloud = wrap.querySelector('#cucu-cloud');
+    Art.addCheer(wrap, 'left:8px;bottom:170px;width:150px;height:210px;');
   },
 
   _t: function (ms, fn) { var t = setTimeout(fn, ms); this._timers.push(t); return t; },
@@ -40,6 +46,7 @@ GAMES['cucu'] = {
     this.layer.innerHTML = '';
     this.ready = false; this.solved = false;
     this.bushes = [];
+    this.roundIdx = i;
 
     var hideCount = i < 2 ? 1 : 2;
     var pool = this.POOL.slice();
@@ -91,13 +98,47 @@ GAMES['cucu'] = {
       d += 1200;
     }
 
-    // se esconden (round 4: con cortina de nube)
+    // se esconden (ronda 5: con cortina de nube)
     this._t(d, function () {
       if (i >= 4) self._curtain();
       Sound.play('whoosh');
       for (var b = 0; b < shown.length; b++) shown[b].anim.classList.remove('peek');
-      self._t(900, function () { self.ready = true; self._ask(); self._startHints(); });
+      // rondas 3+: ¡los arbustos bailan y cambian de lugar! (reto de memoria)
+      if (i >= 2) {
+        self._t(800, function () {
+          self._shuffle(i >= 4 ? 3 : 2, function () {
+            self._t(300, function () { self._begin(); });
+          });
+        });
+      } else {
+        self._t(900, function () { self._begin(); });
+      }
     });
+  },
+
+  _begin: function () {
+    this.ready = true;
+    this._ask();
+    this._startHints();
+  },
+
+  // intercambia pares de arbustos con animación (los animales viajan dentro)
+  _shuffle: function (times, done) {
+    var self = this;
+    var step = 0;
+    function once() {
+      var a = Math.floor(Math.random() * 4);
+      var b = (a + 1 + Math.floor(Math.random() * 3)) % 4;
+      var la = self.bushes[a].el.style.left;
+      var lb = self.bushes[b].el.style.left;
+      Sound.play('whoosh');
+      self.bushes[a].el.style.left = lb;
+      self.bushes[b].el.style.left = la;
+      step++;
+      if (step < times) self._t(650, once);
+      else self._t(620, done);
+    }
+    once();
   },
 
   _curtain: function () {
@@ -113,20 +154,19 @@ GAMES['cucu'] = {
 
   _startHints: function () {
     var self = this;
-    var n = 0;
+    var n = 0, reasked = false;
     this.hint = setInterval(function () {
       if (self.solved || !self.ready) return;
       n++;
-      if (n % 2 === 0) self._ask(); // alterna pista visual y re-pregunta
+      // la voz recuerda la instrucción UNA sola vez; la pista visual sí continúa
+      if (n === 2 && !reasked) { reasked = true; self._ask(); }
       for (var b = 0; b < self.bushes.length; b++) {
         if (self.bushes[b].animal === self.target) {
           var bu = self.bushes[b];
           bu.el.classList.remove('rustle'); void bu.el.offsetWidth; bu.el.classList.add('rustle');
-          bu.anim.classList.add('tease');
-          (function (a) { self._t(450, function () { a.classList.remove('tease'); }); })(bu.anim);
         }
       }
-    }, 5000);
+    }, 6500);
   },
 
   _tap: function (bushEl, animal) {
@@ -143,7 +183,8 @@ GAMES['cucu'] = {
       rec.anim.classList.add('peek');
       var c = Stage.centerOf(bushEl);
       this.api.correct(c.x, c.y, { say: '¡Cucú! Aquí está ' + animal[1] });
-      this._t(900, function () { self.api.roundComplete(); });
+      this._addFriend(animal);
+      this._t(1100, function () { self.api.roundComplete(); });
     } else if (animal) {
       // señuelo: se asoma y se ríe
       rec.anim.classList.add('peek');
@@ -157,10 +198,32 @@ GAMES['cucu'] = {
     }
   },
 
+  // colección de amigos encontrados (se queda entre rondas)
+  _addFriend: function (animal) {
+    this.friends.push(animal);
+    var f = document.createElement('span');
+    f.className = 'friend';
+    f.textContent = animal[0];
+    this.friendsEl.appendChild(f);
+    Sound.play('sparkle');
+    var self = this;
+    var n = this.friends.length;
+    this._t(900, function () {
+      if (n >= 5) {
+        self.friendsEl.classList.add('party');
+        Voz.speak('¡Cinco amigos! ¡Todos contigo, Cami!', { interrupt: false });
+      } else if (n >= 2) {
+        Voz.speak('¡Ya tienes ' + ['', '', 'dos', 'tres', 'cuatro'][n] + ' amigos!', { interrupt: false });
+      }
+    });
+  },
+
   _cap: function (s) { return s.charAt(0).toUpperCase() + s.slice(1); },
 
   destroy: function () {
     this._clearTimers();
     if (this.hint) { clearInterval(this.hint); this.hint = null; }
+    this.friends = [];
+    if (this.friendsEl) { this.friendsEl.innerHTML = ''; this.friendsEl.classList.remove('party'); }
   }
 };

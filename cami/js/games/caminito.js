@@ -125,7 +125,7 @@ GAMES['caminito'] = {
     api.idleHint(9000, function () {
       if (self.busy) return;
       api.hand(self.die, null);
-      Voz.speak('¡Toca el dado, Cami!');
+      api.hintSpeak('¡Toca el dado, Cami!');
     });
   },
 

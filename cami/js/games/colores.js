@@ -30,6 +30,7 @@ GAMES['colores'] = {
     scene.appendChild(wrap);
     this.itemsEl = wrap.querySelector('.col-items');
     this.basketsEl = wrap.querySelector('.col-baskets');
+    Art.addCheer(wrap, 'left:12px;bottom:6px;width:170px;height:238px;');
   },
 
   nextRound: function (i) {
@@ -48,7 +49,7 @@ GAMES['colores'] = {
         for (var z = 0; z < self.baskets.length; z++) {
           if (self.baskets[z].color === it.color) {
             self.api.hand(it.el, self.baskets[z].el);
-            Voz.speak('Va con el color ' + it.color);
+            self.api.hintSpeak('Va con el color ' + it.color);
             return;
           }
         }

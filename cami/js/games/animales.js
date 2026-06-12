@@ -93,10 +93,10 @@ GAMES['animales'] = {
   _ask: function () {
     if (this.solved) return;
     var self = this;
-    Voz.speak(this.question);
     this._askCount = (this._askCount || 0) + 1;
-    // tras dos preguntas sin acierto, el animal correcto da un brinquito de pista
-    if (this._askCount >= 3) {
+    // la voz pregunta al inicio y recuerda UNA sola vez; después la pista es visual
+    if (this._askCount <= 2) Voz.speak(this.question);
+    if (this._askCount >= 2) {
       var els = this.layer.querySelectorAll('.animal');
       for (var j = 0; j < this.current.length; j++) {
         if (this.current[j] === this.target && els[j]) {

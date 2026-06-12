@@ -106,7 +106,7 @@ GAMES['rompecabezas'] = {
         for (var z = 0; z < self2.cells.length; z++) {
           if (self2.cells[z].idx === pr.idx && !self2.cells[z].filled) {
             self2.api.hand(pr.el, self2.cells[z].el);
-            Voz.speak('¿Dónde va esta pieza?');
+            self2.api.hintSpeak('¿Dónde va esta pieza?');
             return;
           }
         }

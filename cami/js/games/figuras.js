@@ -18,7 +18,8 @@ GAMES['figuras'] = {
     ['triangle', 'heart', 'moon'],
     ['star', 'heart', 'moon']
   ],
-  YS: [170, 420, 670],
+  YS_SLOT: [50, 285, 520],   // dentro del tablero (720px de alto)
+  YS_TRAY: [60, 320, 580],   // bandeja izquierda: las 3 piezas completas en pantalla
 
   _path: function (shape) {
     switch (shape) {
@@ -52,6 +53,8 @@ GAMES['figuras'] = {
     scene.appendChild(wrap);
     this.board = wrap.querySelector('.fig-board');
     this.tray = wrap.querySelector('.fig-tray');
+    // Cami anima desde el centro (entre bandeja y tablero)
+    Art.addCheer(wrap, 'left:600px;bottom:0;');
   },
 
   nextRound: function (i) {
@@ -71,7 +74,7 @@ GAMES['figuras'] = {
         for (var z = 0; z < self.slots.length; z++) {
           if (!self.slots[z].filled && self.slots[z].shape === pc.shape) {
             self.api.hand(pc.el, self.slots[z].el);
-            Voz.speak('Pon ' + self.NAMES[pc.shape] + ' en su lugar');
+            self.api.hintSpeak('Pon ' + self.NAMES[pc.shape] + ' en su lugar');
             return;
           }
         }
@@ -83,7 +86,7 @@ GAMES['figuras'] = {
     for (var s = 0; s < shapes.length; s++) {
       var slot = document.createElement('div');
       slot.className = 'fig-slot';
-      slot.style.top = this.YS[s] + 'px';
+      slot.style.top = this.YS_SLOT[s] + 'px';
       slot.innerHTML = this._svg(shapes[s], null, true);
       slot.dataset.shape = shapes[s];
       this.board.appendChild(slot);
@@ -128,7 +131,7 @@ GAMES['figuras'] = {
           },
           onWrong: function (el, target) { self.api.wrong(target.el, { say: '¡Casi! ¿Dónde va?' }); }
         });
-      })(order[p], this.YS[p]);
+      })(order[p], this.YS_TRAY[p]);
     }
   },
 

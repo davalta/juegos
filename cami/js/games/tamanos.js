@@ -42,7 +42,7 @@ GAMES['tamanos'] = {
         if (tr.done) continue;
         var who = tr.size === 'big' ? self.cami : self.lola;
         self.api.hand(tr.el, who);
-        Voz.speak(tr.size === 'big' ? 'Lo grande para Cami' : 'Lo chico para Lola');
+        self.api.hintSpeak(tr.size === 'big' ? 'Lo grande para Cami' : 'Lo chico para Lola');
         return;
       }
     });
