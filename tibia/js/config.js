@@ -3,10 +3,17 @@
 
 export const TILE = 32;          // rendered tile size in px
 export const SRC = 16;           // source sprite size (authored 16x16, drawn x2)
-export const VIEW_W = 15;        // visible tiles wide (like the classic client)
-export const VIEW_H = 11;        // visible tiles tall
-export const CENTER_X = 7;       // player column on screen (0-indexed)
-export const CENTER_Y = 5;       // player row on screen
+
+// Visible viewport in tiles. Dynamic: the renderer fills the available window
+// with whole tiles and recomputes this on resize. Defaults mirror the classic
+// 15x11 client; setView() keeps the centre indices in sync.
+export const view = { w: 15, h: 11, cx: 7, cy: 5 };
+export function setView(w, h) {
+  view.w = Math.max(11, w);
+  view.h = Math.max(9, h);
+  view.cx = Math.floor(view.w / 2);
+  view.cy = Math.floor(view.h / 2);
+}
 
 export const MAP_W = 64;
 export const MAP_H = 64;

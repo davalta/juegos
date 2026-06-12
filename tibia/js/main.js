@@ -1,7 +1,7 @@
 // main.js — boot, game loop, and the canvas renderer.
 
 import {
-  TILE, VIEW_W, VIEW_H, CENTER_X, CENTER_Y, MAP_W, MAP_H,
+  TILE, view, setView, MAP_W, MAP_H,
 } from './config.js';
 import { game, log, clamp } from './state.js';
 import { buildSprites, sprites } from './sprites.js';
@@ -13,7 +13,7 @@ import { loadGame, saveGame } from './save.js';
 import { initUI, renderUI } from './ui.js';
 import { initInput, updateInput } from './input.js';
 
-let canvas, ctx;
+let canvas, ctx, wrapEl;
 
 function boot() {
   buildSprites();
@@ -24,10 +24,13 @@ function boot() {
   window.game = game; // dev console hook: tinker with the world from devtools
 
   canvas = document.getElementById('game');
-  canvas.width = VIEW_W * TILE;
-  canvas.height = VIEW_H * TILE;
   ctx = canvas.getContext('2d');
-  ctx.imageSmoothingEnabled = false;
+  wrapEl = document.getElementById('viewport-wrap');
+  computeView();
+  // recompute once the flex layout has settled, and on any window change
+  requestAnimationFrame(() => requestAnimationFrame(computeView));
+  window.addEventListener('load', computeView);
+  window.addEventListener('resize', computeView);
 
   initUI();
   initInput(canvas, document.getElementById('chat-input'));
@@ -37,6 +40,20 @@ function boot() {
   log('Click a rune in your backpack, then click a target. Type spells like "exura".', 'lightblue');
 
   requestAnimationFrame(loop);
+}
+
+// Fill the available window area with whole tiles (crisp, no scaling).
+// Called every frame; only touches the canvas when the tile count changes, so
+// it self-corrects the initial layout and any window resize for free.
+function computeView() {
+  const rect = wrapEl.getBoundingClientRect();
+  const w = Math.min(Math.max(11, Math.floor((rect.width - 8) / TILE)), MAP_W);
+  const h = Math.min(Math.max(9, Math.floor((rect.height - 8) / TILE)), MAP_H);
+  if (w === view.w && h === view.h && canvas.width === w * TILE) return;
+  setView(w, h);
+  canvas.width = view.w * TILE;
+  canvas.height = view.h * TILE;
+  ctx.imageSmoothingEnabled = false; // a canvas resize resets context state
 }
 
 let lastSave = 0;
@@ -95,8 +112,8 @@ function decay(now) {
 function render(now) {
   const p = game.player;
   const pr = p.renderPos(now);
-  const camX = clamp(pr.x - CENTER_X, 0, MAP_W - VIEW_W);
-  const camY = clamp(pr.y - CENTER_Y, 0, MAP_H - VIEW_H);
+  const camX = clamp(pr.x - view.cx, 0, Math.max(0, MAP_W - view.w));
+  const camY = clamp(pr.y - view.cy, 0, Math.max(0, MAP_H - view.h));
   game.camera.x = camX; game.camera.y = camY;
 
   const sx = (wx) => (wx - camX) * TILE;
@@ -105,8 +122,8 @@ function render(now) {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const x0 = Math.floor(camX) - 1, x1 = Math.floor(camX) + VIEW_W + 1;
-  const y0 = Math.floor(camY) - 1, y1 = Math.floor(camY) + VIEW_H + 1;
+  const x0 = Math.floor(camX) - 1, x1 = Math.floor(camX) + view.w + 1;
+  const y0 = Math.floor(camY) - 1, y1 = Math.floor(camY) + view.h + 1;
 
   // terrain + objects
   for (let wy = y0; wy <= y1; wy++) {

@@ -2,7 +2,7 @@
 // battle list, console, spell bar, loot window, death screen.
 
 import { game, dist } from './state.js';
-import { VIEW_W } from './config.js';
+import { view } from './config.js';
 import { sprites } from './sprites.js';
 import { ITEMS, SLOTS, useItem, equipFromBackpack, unequip } from './items.js';
 import { castSpell } from './spells.js';
@@ -153,7 +153,7 @@ function renderMinimap() {
 function renderBattleList() {
   const p = game.player;
   const near = game.creatures
-    .filter(c => c.hp > 0 && dist(p.x, p.y, c.x, c.y) <= Math.ceil(VIEW_W / 2) + 1)
+    .filter(c => c.hp > 0 && dist(p.x, p.y, c.x, c.y) <= Math.ceil(view.w / 2) + 1)
     .sort((a, b) => dist(p.x, p.y, a.x, a.y) - dist(p.x, p.y, b.x, b.y))
     .slice(0, 12);
   el.battle.innerHTML = '';

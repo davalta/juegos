@@ -30,14 +30,17 @@ html, body {
 
 canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
 
-/* ---------------- outer client frame ---------------- */
+/* ---------------- outer client frame (fills the window) ---------------- */
 #client {
-  width: 728px;
-  margin: 14px auto;
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
   background: var(--stone);
   border: 3px solid;
   border-color: var(--tan) var(--tan-dk) var(--tan-dk) var(--tan);
-  box-shadow: 0 0 0 2px #0c0b09, 0 10px 40px rgba(0,0,0,.6);
+  box-shadow: inset 0 0 0 2px #0c0b09;
   padding: 4px;
 }
 
@@ -65,20 +68,22 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
 .tb-btn:active { border-color: var(--bevel-dk) var(--bevel-lt) var(--bevel-lt) var(--bevel-dk); }
 .tb-btn.big { font-size: 14px; padding: 8px 20px; margin-top: 12px; }
 
-/* ---------------- main row ---------------- */
-#main { display: flex; gap: 4px; align-items: flex-start; }
+/* ---------------- main row (fills remaining height) ---------------- */
+#main { display: flex; gap: 4px; align-items: stretch; flex: 1; min-height: 0; }
 
-#viewport-wrap { position: relative; width: 480px; height: 352px; flex: none; }
-#game {
-  display: block; width: 480px; height: 352px; background: #000;
+/* viewport grows to fill; the canvas is centred and letterboxed in black */
+#viewport-wrap {
+  position: relative; flex: 1; min-width: 0; min-height: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: #000;
   border: 3px solid; border-color: var(--bevel-dk) var(--bevel-lt) var(--bevel-lt) var(--bevel-dk);
 }
-#viewport-frame { position: absolute; inset: 0; pointer-events: none;
-  box-shadow: inset 0 0 0 1px #00000080; }
+#game { display: block; background: #000; }
+#viewport-frame { display: none; }
 
 /* ---------------- sidebar ---------------- */
 #sidebar {
-  width: 236px; height: 352px; flex: none;
+  width: 236px; flex: none; align-self: stretch; min-height: 0;
   overflow-y: auto; overflow-x: hidden;
   display: flex; flex-direction: column; gap: 4px;
   padding-right: 2px;
@@ -269,9 +274,10 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
 
 .hidden { display: none !important; }
 
-/* small screens: let it scroll rather than break */
+/* small screens: stack the world above the sidebar */
 @media (max-width: 760px) {
-  #client { width: 100%; }
-  #main { flex-direction: column; align-items: center; }
-  #sidebar { width: 480px; max-width: 100%; height: auto; }
+  #client { height: auto; min-height: 100vh; }
+  #main { flex-direction: column; align-items: stretch; }
+  #viewport-wrap { min-height: 55vh; }
+  #sidebar { width: 100%; align-self: stretch; max-height: 40vh; }
 }
