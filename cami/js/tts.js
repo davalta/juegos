@@ -1,9 +1,13 @@
-/* Voz — narración en español con speechSynthesis.
-   Frases cortas, voz es-MX preferida, cancel antes de cada speak. */
+/* Voz — narración en español.
+   1º: audio PREGRABADO (audio/voz/*.mp3, voz neuronal Dalia es-MX, manifiesto
+       en js/voces.js generado por tools/gen_voces.py) — calidad humana.
+   2º: speechSynthesis del navegador, solo como respaldo si la frase no existe. */
 var Voz = {
   voice: null,
   muted: false,
   ready: false,
+  _audio: null,        // reproductor único para las frases pregrabadas
+  _audioUnlocked: false,
 
   PRAISE: ['¡Muy bien!', '¡Bravo!', '¡Excelente!', '¡Eso es!', '¡Súper, Cami!', '¡Lo lograste!', '¡Qué linda!'],
   ALMOST: ['¡Casi!', 'Inténtalo otra vez', '¡Tú puedes, Cami!', 'Mmm, otra vez'],
@@ -74,10 +78,45 @@ var Voz = {
     if (this.muted) this.cancel();
   },
 
+  // misma normalización que tools/gen_voces.py: así un "¡El círculo!" y un
+  // "el círculo" comparten el mismo archivo de audio
+  _norm: function (t) {
+    return String(t).toLowerCase()
+      .replace(/[¡!¿?.,:;]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  },
+
+  _playFile: function (src, opts) {
+    opts = opts || {};
+    if (!this._audio) this._audio = new Audio();
+    var a = this._audio;
+    var self = this;
+    if (opts.interrupt === false && !a.paused && !a.ended && a.src) {
+      // sin interrumpir: encola para cuando termine la frase actual
+      a.onended = function () { a.onended = null; self._playFile(src, { interrupt: true }); };
+      return;
+    }
+    try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (e) {}
+    a.onended = null;
+    a.src = src;
+    a.volume = 1;
+    var p = a.play();
+    if (p && p.catch) p.catch(function () { /* autoplay bloqueado: silencio */ });
+  },
+
   speak: function (text, opts) {
-    if (!('speechSynthesis' in window) || this.muted || !text) return;
+    if (this.muted || !text) return;
     if (document.hidden) return; // no hablar si la pestaña no está visible
     opts = opts || {};
+    // 1º intenta la frase pregrabada (voz humana)
+    var key = this._norm(text);
+    if (window.VOCES && window.VOCES[key]) {
+      this._playFile(window.VOCES[key], opts);
+      return;
+    }
+    // 2º respaldo: sintetizador del navegador
+    if (!('speechSynthesis' in window)) return;
     try {
       if (opts.interrupt !== false) window.speechSynthesis.cancel();
       var u = new SpeechSynthesisUtterance(text);
@@ -92,11 +131,27 @@ var Voz = {
   },
 
   cancel: function () {
+    if (this._audio) {
+      this._audio.onended = null;
+      try { this._audio.pause(); } catch (e) {}
+    }
     try { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); } catch (e) {}
   },
 
   prime: function () {
-    // desbloquea TTS dentro del primer gesto (iOS/Chrome)
+    // desbloquea el audio HTML y el TTS dentro del primer gesto (iOS/Chrome)
+    if (!this._audioUnlocked && window.VOCES) {
+      try {
+        if (!this._audio) this._audio = new Audio();
+        var a = this._audio;
+        var self = this;
+        for (var k in window.VOCES) { a.src = window.VOCES[k]; break; }
+        a.volume = 0;
+        var p = a.play();
+        var ok = function () { a.pause(); a.volume = 1; self._audioUnlocked = true; };
+        if (p && p.then) p.then(ok).catch(function () {}); else ok();
+      } catch (e) {}
+    }
     if (!('speechSynthesis' in window) || this.muted) return;
     try {
       var u = new SpeechSynthesisUtterance(' ');

@@ -45,7 +45,7 @@ GAMES['numeros'] = {
     var goal = '';
     for (var g = 0; g < N; g++) goal += '🧀';
     this.bubble.innerHTML = '<div class="bubble-in">' + goal + '</div>';
-    Voz.speak('Lola quiere ' + this.WORDS[N] + (N === 1 ? ' quesito' : ' quesitos') + '. ¡Solo ' + this.WORDS[N] + '!');
+    Voz.speak('Lola quiere ' + (N === 1 ? 'un quesito' : this.WORDS[N] + ' quesitos') + '. ¡Solo ' + this.WORDS[N] + '!');
 
     // pista: manita del primer quesito visible a la boca (voz solo una vez)
     this.api.idleHint(8000, function () {
@@ -85,7 +85,7 @@ GAMES['numeros'] = {
             Confetti.hearts(c.x, c.y - 80, 4);
             if (self.count >= self.total) {
               self.api.after(700, function () {
-                self.api.correct(c.x, c.y - 80, { say: '¡' + self._cap(self.WORDS[self.total]) + (self.total === 1 ? ' quesito' : ' quesitos') + '! ¡Ñam ñam! ¡Justo lo que quería!' });
+                self.api.correct(c.x, c.y - 80, { say: '¡' + (self.total === 1 ? 'Un quesito' : self._cap(self.WORDS[self.total]) + ' quesitos') + '! ¡Ñam ñam! ¡Justo lo que quería!' });
                 // los quesitos sobrantes siguen un momento: si Cami ofrece otro,
                 // Lola enseña "ya comí" antes de cerrar la ronda
                 self.api.after(2000, function () {
